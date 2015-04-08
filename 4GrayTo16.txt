@@ -1,0 +1,62 @@
+﻿;4灰度格式转为16灰度格式
+;图片数据在$3380
+;结果放在$2000
+4GrayTo16:
+    LDA #$00
+    STA $80
+    LDA #$20
+    STA $81
+    LDA #$80
+    STA $82
+    LDA #$33
+    STA $83
+grayto4:
+    LDX #$02
+    LDA #$00
+    STA $84
+    TAY
+    LDA ($82),Y
+    STA $85
+grayto1:
+    LDA #$00
+    STA $84
+    TAY
+    ASL $85
+    ROL $84
+    ASL $85
+    ROL $84
+    LDA $84
+    TAY
+    LDA GTT1,Y
+    STA $86
+    LDA #$00
+    STA $84
+    TAY
+    ASL $85
+    ROL $84
+    ASL $85
+    ROL $84
+    LDA $84
+    TAY
+    LDA GTT2,Y
+    ORA $86
+    LDY #$00
+    STA ($80),Y
+    INC $80
+    BNE grayto2
+    INC $81
+grayto2:
+    DEX
+    BNE grayto1
+    INC $82
+    BNE grayto3
+    INC $83
+grayto3:
+    LDA $83
+    CMP #$40
+    BNE grayto4
+    RTS
+GTT1:
+    .DB $F0,$A0,$50,$00
+GTT2:
+    .DB $0F,$0A,$05,$00

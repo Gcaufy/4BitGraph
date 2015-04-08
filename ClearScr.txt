@@ -1,0 +1,31 @@
+﻿;用背景色清除屏幕
+BgColor=$03d0
+ClearScreen:
+    LDA #$80
+    STA $80
+    LDA #$13
+    STA $81
+    LDA #$00
+    LDY #$00
+    CLC
+    LDX BgColor
+    BEQ color0
+    DEX
+    BEQ color1
+    DEX
+    BEQ color2
+    ADC #$55
+color2:
+    ADC #$55
+color1:
+    ADC #$55
+color0:
+    STA ($80),Y
+    INC $80
+    BNE cl1
+    INC $81
+cl1:
+    LDX $81
+    CPX #$20
+    BNE color0
+    RTS

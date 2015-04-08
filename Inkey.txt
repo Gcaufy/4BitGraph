@@ -1,0 +1,31 @@
+﻿;若四灰下使用INT $C006,按热键后没恢复为二色
+;四灰度下用JSR Inkey代替INT $C006
+Inkey:
+    LDA $C7
+    BMI inkey1
+    LDA #$00
+    STA $03F6
+    CLC
+    BCC Inkey
+inkey1:
+    LDA $C7
+    CMP #$A1
+    BEQ inkey2
+    CMP #$98
+    BEQ inkey2
+    CMP #$80
+    BCC inkey3
+    CMP #$8D
+    BCS inkey3
+inkey2:
+    LDA $C7
+    PHA
+    LDA #$00
+    STA $03D0
+    JSR ClearScreen
+    JSR Regain
+    PLA
+    STA $C7
+inkey3:
+    INT $C006
+    RTS

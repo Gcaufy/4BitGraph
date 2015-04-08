@@ -1,0 +1,86 @@
+﻿;$03c3~$03c6:x1,y1,x2,y2
+;$92,$93:图片地址
+
+Graph_x1=$03c3
+Graph_y1=$03c4
+Graph_x2=$03c5
+Graph_y2=$03c6
+
+
+GrayGraph:
+    LDA Graph_x1
+    CMP #$A1
+    BCC x1
+    LDA #$A0
+    STA Graph_x1
+x1:
+    LSR
+    LSR
+    STA $80
+    LDA Graph_x2
+    CMP #$A1
+    BCC x2
+    LDA #$A0
+    STA Graph_x2
+x2:
+    LSR
+    LSR
+    STA $81
+    SEC
+    SBC $80
+    STA $81
+    LDA #$80
+    STA $82
+    LDA #$13
+    STA $83
+    CLC
+    LDA $80
+    ADC $82
+    STA $82
+    LDA $83
+    ADC #$00
+    STA $83
+    LDX Graph_y1
+    BNE draw3
+    INX
+draw3:
+    CLC
+    LDA $82
+    ADC #$28
+    STA $82
+    LDA $83
+    ADC #$00
+    STA $83
+    DEX
+    BNE draw3
+    SEC
+    LDA Graph_y2
+    SBC Graph_y1
+    TAX
+draw2:
+    LDY #$00
+draw1:
+    LDA ($92),Y
+    STA ($82),Y
+    INY
+    CPY $81
+    BNE draw1
+    DEX
+    BEQ drawend
+    CLC
+    LDA $82
+    ADC #$28
+    STA $82
+    LDA $83
+    ADC #$00
+    STA $83
+    TYA
+    CLC
+    ADC $92
+    STA $92
+    LDA #$00
+    ADC $93
+    STA $93
+    JMP draw2
+drawend:
+    RTS

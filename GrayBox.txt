@@ -1,0 +1,206 @@
+﻿;$03c9 =$00:用背景色画
+;$03c9 =$01:用前景色画
+;$03c9 =$02:反显
+;$03d0,$03d1:背景色,前景色
+
+Graph_x1=$03c3
+Graph_y1=$03c4
+Graph_x2=$03c5
+Graph_y2=$03c6
+
+Graph_x=$03c7
+Graph_y=$03c8
+GraphType=$03c9
+BgColor=$03d0
+FgColor=$03d1
+
+;画填充方块
+GrayBox:
+    LDX Graph_y1
+    DEX
+box1:
+    STX Graph_y
+    TXA
+    PHA
+    JSR LineX
+    PLA
+    TAX
+    INX
+    CPX Graph_y2
+    BNE box1
+    RTS
+;画横线
+LineX:
+    LDA Graph_x1
+    CMP #$A1
+    BCC line1
+    LDA #$A0
+    STA Graph_x1
+line1:
+    LDA Graph_x2
+    CMP #$A1
+    BCC line2
+    LDA #$A0
+    STA Graph_x2
+line2:
+    LDA Graph_y
+    CMP #$51
+    BCC line3
+    LDA #$50
+    STA Graph_y
+line3
+    LDA Graph_x2
+    CMP Graph_x1
+    BCS line4
+    RTS
+line4:
+    LDA Graph_x1
+    BNE line18
+    INC Graph_x1
+line18:
+    LDA #$80
+    STA $80
+    LDA #$13
+    STA $81
+    LDX #$28
+line5:
+    CLC
+    LDA Graph_y
+    ADC $80
+    STA $80
+    LDA $81
+    ADC #$00
+    STA $81
+    DEX
+    BNE line5
+    LDA Graph_x1
+    LSR
+    LSR
+    CLC
+    ADC $80
+    STA $80
+
+    LDA $81
+    ADC #$00
+    STA $81
+    LDA Graph_x1
+    AND #$03
+    TAX
+    JSR geta
+    STA $82
+    CPX #$00
+    BEQ line9
+line6:
+    LSR
+    LSR
+    DEX
+    BNE line6
+    LDY #$00
+    JSR line11
+    INC $80
+    BNE line9
+    INC $81
+line9:
+    LDA Graph_x2
+    SEC
+    SBC Graph_x1
+    LSR
+    LSR
+    TAY
+    TAX
+    CMP #$00
+    BNE line14
+    LDA Graph_x2
+    AND #$03
+    CMP #$00
+    BNE line15
+    JMP line13
+line15:
+    RTS
+line14:
+    CMP #$01
+    BNE line16
+    LDA Graph_x2
+    AND #$03
+    BEQ line7
+    JMP line13
+line16:
+    LDA Graph_x2
+    AND #$03
+    BEQ line7
+    DEY
+line7:
+    DEY
+    LDA $82
+    JSR line11
+    CPY #$00
+    BNE line7
+line13:
+    LDA Graph_x2
+    AND #$03
+    TAY
+    LDA $82
+    CPY #$03
+    BEQ line17
+
+    CPY #$00
+    BNE line8
+    INX
+line8:
+    ASL
+    ASL
+    INY
+    CPY #$03
+    BNE line8
+
+line17:
+    PHA
+    TXA
+    TAY
+    DEY
+    PLA
+    JSR line11
+    RTS
+line11:
+    PHA
+
+    LDA GraphType
+    CMP #$02
+    BEQ line12
+    PLA
+    STA ($80),Y
+    RTS
+line12:
+    PLA
+    EOR ($80),Y
+    STA ($80),Y
+    RTS
+geta:
+    LDY GraphType
+    BEQ Bg
+    LDY FgColor
+    JSR geta1
+    RTS
+Bg:
+    LDY BgColor
+    JSR geta1
+    RTS
+geta1:
+    LDA #$00
+    CLC
+    CPY #$00
+    BEQ geta2
+    DEY
+    BEQ geta3
+    DEY
+    BEQ geta4
+    ADC #$55
+geta4:
+    ADC #$55
+geta3:
+    ADC #$55
+geta2:
+    TAY
+    DEY
+    TYA
+    RTS

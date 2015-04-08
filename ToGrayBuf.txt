@@ -1,0 +1,95 @@
+﻿;将显存$19C0的内容发送到$1380
+;$03d0:背景色0~3,$03d1:前景色0~3
+;若背景色大于3,则背景色为0
+;若前景色大于3,则前景色为3
+ToGrayBuffer:
+    LDA $03D0
+    CMP #$04
+    BCC qjs
+    LDA #$00
+    STA $03D0
+qjs:
+    LDA $03D1
+    CMP #$04
+    BCC send
+    LDA #$03
+    STA $03D1
+send:
+    LDA #$C0
+    STA $80
+    LDA #$19
+    STA $81
+    LDA #$80
+    STA $82
+    LDA #$13
+    STA $83
+    LDY #$00
+    LDA $03D0
+    ASL
+    ASL
+    ASL
+    ASL
+    ASL
+    ASL
+    STA $84
+    LDA $03D1
+    ASL
+    ASL
+    ASL
+    ASL
+    ASL
+    ASL
+    STA $85
+    LDA #$00
+    STA $86
+    STA $87
+send7:
+    LDX #$08
+    LDA ($80),Y
+    STA $88
+send1:
+    ASL $88
+    BCC send2
+    LDA $85
+    ASL
+    ROL $87
+    ROL $86
+    ASL
+    ROL $87
+    ROL $86
+    CLC
+    BCC send3
+send2:
+    LDA $84
+    ASL
+    ROL $87
+    ROL $86
+    ASL
+    ROL $87
+    ROL $86
+send3:
+    DEX
+    BNE send1
+    LDA $86
+    STA ($82),Y
+    INC $82
+    BNE send4
+    INC $83
+send4:
+    LDA $87
+    STA ($82),Y
+    INC $82
+    BNE send5
+    INC $83
+send5:
+    INC $80
+    BNE send6
+    INC $81
+send6:
+    LDA $81
+    CMP #$20
+    BNE send8
+    RTS
+send8:
+    JMP send7
+       
